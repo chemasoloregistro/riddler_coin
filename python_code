@@ -1,0 +1,66 @@
+import random
+import matplotlib
+import matplotlib.pyplot as plt
+import thinkbayes
+import thinkplot
+
+FORMATS = ['pdf']
+max_prob = []
+average_pos = []
+average_neg = []
+
+def flipCoin():
+    flip = random.randint(0,1)
+
+    if flip == 0:
+        return True
+    elif flip == 1:
+        return False
+
+def main():
+	goals = range(2,11)
+	for goal in goals:
+		counter_list = []
+		counter_list_neg = []
+		flips = 0
+		while flips <= 1000000:
+			x = 0
+			counter = 1
+			while counter <= 10000:
+				if flipCoin():
+					x += 1
+					if x == goal:
+						counter_list.append(counter)
+						# print rolls, counter, x
+						break
+				else:
+					x -= 1
+					if x == -goal:
+						counter_list_neg.append(counter)
+						# print rolls, counter, x
+						break
+				counter += 1
+			flips += 1
+
+		counter_Cdf = thinkbayes.MakeCdfFromList(counter_list)
+		counter_Pmf = thinkbayes.MakePmfFromCdf(counter_Cdf)
+		max_prob.append(counter_Pmf.MaximumLikelihood())
+		average_pos.append(sum(counter_list)/len(counter_list))
+		counter_neg_Cdf = thinkbayes.MakeCdfFromList(counter_list_neg)
+		counter_neg_Pmf = thinkbayes.MakePmfFromCdf(counter_neg_Cdf)
+		max_prob.append(counter_neg_Pmf.MaximumLikelihood())
+		average_neg.append(sum(counter_list_neg)/len(counter_list_neg))
+
+		thinkplot.Clf()
+		thinkplot.PrePlot(num=2)
+		thinkplot.Pmf(counter_Pmf)
+		thinkplot.Pmf(counter_neg_Pmf)	
+		thinkplot.Save(root='Flips to '+str(goal),
+					xlabel='Goal '+str(goal),
+					ylabel='Probability',
+					formats=FORMATS)
+
+	print average_pos, average_neg
+
+if __name__ == '__main__':
+    main()
