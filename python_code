@@ -26,7 +26,7 @@ def main():
 		while flips <= 1000000:
 			x = 0
 			counter = 1
-			while counter <= 10000:
+			while counter <= 100:
 				if flipCoin():
 					x += 1
 					if x == goal:
